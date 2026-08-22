@@ -1,22 +1,46 @@
-import crxLogo from "@/assets/crx.svg";
-import reactLogo from "@/assets/react.svg";
-import viteLogo from "@/assets/vite.svg";
-import HelloWorld from "@/components/HelloWorld";
-import "./App.css";
+import React from "react";
+import { usePopupState } from "./hooks/usePopupState";
+import { Header } from "./components/Header";
+import { ModeSwitcher } from "./components/ModeSwitcher";
+import { AutoView } from "./components/AutoView";
+import { ManualView } from "./components/ManualView";
+import { DeviceSettings } from "./components/DeviceSettings";
+import { Footer } from "./components/Footer";
 
-export default function App() {
+export const App: React.FC = () => {
+  const { state, setMode, setManualColor, saveConfig, testPing } =
+    usePopupState();
+
+  const mode = state?.config?.mode || "auto";
+  const manualColor = state?.config?.manualColor || "green";
+  const targetColor = state?.targetColor || "green";
+
   return (
-    <div>
-      <a href="https://vite.dev" target="_blank" rel="noreferrer">
-        <img src={viteLogo} className="logo" alt="Vite logo" />
-      </a>
-      <a href="https://reactjs.org/" target="_blank" rel="noreferrer">
-        <img src={reactLogo} className="logo react" alt="React logo" />
-      </a>
-      <a href="https://crxjs.dev/vite-plugin" target="_blank" rel="noreferrer">
-        <img src={crxLogo} className="logo crx" alt="crx logo" />
-      </a>
-      <HelloWorld msg="Vite + React + CRXJS" />
+    <div className="app-container">
+      <Header />
+
+      <ModeSwitcher mode={mode} onModeChange={setMode} />
+
+      {mode === "auto" ? (
+        <AutoView
+          aggregated={state?.aggregated}
+          targetColor={targetColor}
+          tabs={state?.tabs}
+        />
+      ) : (
+        <ManualView manualColor={manualColor} onSelectColor={setManualColor} />
+      )}
+
+      <DeviceSettings
+        espUrl={state?.config?.espUrl}
+        connectionState={state?.connectionState}
+        onSaveUrl={saveConfig}
+        onPing={testPing}
+      />
+
+      <Footer />
     </div>
   );
-}
+};
+
+export default App;
