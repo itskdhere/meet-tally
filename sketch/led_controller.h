@@ -4,8 +4,10 @@
 enum LedState {
   STATE_OFF,
   STATE_RED,
+  STATE_YELLOW,
   STATE_BLUE,
-  STATE_GREEN
+  STATE_GREEN,
+  STATE_LIVE
 };
 
 void initLeds();

@@ -13,11 +13,13 @@ constexpr char HOSTNAME[] = "meet-tally";  // Accessible at http://meet-tally.lo
 #define D1 5   // D1 (GPIO5)
 #define D2 4   // D2 (GPIO4)
 #define D5 14  // D5 (GPIO14)
+#define D6 12  // D6 (GPIO12)
 #endif
 
-constexpr uint8_t PIN_RED = D5;    // Red LED Pin: D5 (GPIO14)
-constexpr uint8_t PIN_BLUE = D2;   // Blue LED Pin: D2 (GPIO4)
-constexpr uint8_t PIN_GREEN = D1;  // Green LED Pin: D1 (GPIO5)
+constexpr uint8_t PIN_RED = D6;     // Red LED Pin: D6 (GPIO12) - Camera Only / Live
+constexpr uint8_t PIN_YELLOW = D5;  // Yellow LED Pin: D5 (GPIO14) - Microphone Only / Live
+constexpr uint8_t PIN_BLUE = D2;    // Blue LED Pin: D2 (GPIO4) - In Meeting (Idle)
+constexpr uint8_t PIN_GREEN = D1;   // Green LED Pin: D1 (GPIO5) - Not in Meeting
 
 // LED Logic:
 // true = Active HIGH (Common Cathode)

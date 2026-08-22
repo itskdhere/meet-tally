@@ -17,6 +17,8 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
       --text-muted: #94a3b8;
       --red-color: #ef4444;
       --red-glow: rgba(239, 68, 68, 0.45);
+      --yellow-color: #f59e0b;
+      --yellow-glow: rgba(245, 158, 11, 0.45);
       --blue-color: #3b82f6;
       --blue-glow: rgba(59, 130, 246, 0.45);
       --green-color: #22c55e;
@@ -45,7 +47,7 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
 
     .container {
       width: 100%;
-      max-width: 440px;
+      max-width: 480px;
       background: var(--card-bg);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -76,18 +78,18 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
       background: rgba(30, 41, 59, 0.5);
       border: 1.5px solid #475569;
       border-radius: 44px;
-      padding: 14px 20px;
+      padding: 14px 18px;
       display: inline-flex;
       flex-direction: row;
       align-items: center;
       justify-content: center;
-      gap: 18px;
+      gap: 14px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
     }
 
     .led-bulb {
-      width: 66px;
-      height: 66px;
+      width: 58px;
+      height: 58px;
       border-radius: 50%;
       background: #1e293b;
       border: 3px solid #334155;
@@ -118,6 +120,11 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
     .led-bulb.red.active {
       background: var(--red-color);
       box-shadow: 0 0 30px var(--red-color), 0 0 60px var(--red-glow);
+    }
+
+    .led-bulb.yellow.active {
+      background: var(--yellow-color);
+      box-shadow: 0 0 30px var(--yellow-color), 0 0 60px var(--yellow-glow);
     }
 
     .led-bulb.blue.active {
@@ -156,9 +163,10 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
     </div>
 
     <div class="status-dock">
-      <div id="bulb-red" class="led-bulb red" onclick="setLed('red')" title="Toggle Red"></div>
-      <div id="bulb-blue" class="led-bulb blue" onclick="setLed('blue')" title="Toggle Blue"></div>
-      <div id="bulb-green" class="led-bulb green" onclick="setLed('green')" title="Toggle Green"></div>
+      <div id="bulb-red" class="led-bulb red" onclick="setLed('red')" title="Toggle Red (Camera Only)"></div>
+      <div id="bulb-yellow" class="led-bulb yellow" onclick="setLed('yellow')" title="Toggle Yellow (Microphone Only)"></div>
+      <div id="bulb-blue" class="led-bulb blue" onclick="setLed('blue')" title="Toggle Blue (In Meeting)"></div>
+      <div id="bulb-green" class="led-bulb green" onclick="setLed('green')" title="Toggle Green (Idle)"></div>
     </div>
 
     <div class="footer">
@@ -180,9 +188,15 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
     }
 
     function updateUI(state) {
-      document.getElementById('bulb-red').classList.toggle('active', state === 'red');
-      document.getElementById('bulb-blue').classList.toggle('active', state === 'blue');
-      document.getElementById('bulb-green').classList.toggle('active', state === 'green');
+      const isRed = state === 'red' || state === 'live';
+      const isYellow = state === 'yellow' || state === 'live';
+      const isBlue = state === 'blue';
+      const isGreen = state === 'green';
+
+      document.getElementById('bulb-red').classList.toggle('active', isRed);
+      document.getElementById('bulb-yellow').classList.toggle('active', isYellow);
+      document.getElementById('bulb-blue').classList.toggle('active', isBlue);
+      document.getElementById('bulb-green').classList.toggle('active', isGreen);
     }
 
     async function fetchStatus() {

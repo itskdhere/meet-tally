@@ -38,12 +38,18 @@ static void handleSet() {
     if (led == "red") {
       if (isToggle) toggleLed(STATE_RED);
       else applyLedState(STATE_RED);
+    } else if (led == "yellow") {
+      if (isToggle) toggleLed(STATE_YELLOW);
+      else applyLedState(STATE_YELLOW);
     } else if (led == "blue") {
       if (isToggle) toggleLed(STATE_BLUE);
       else applyLedState(STATE_BLUE);
     } else if (led == "green") {
       if (isToggle) toggleLed(STATE_GREEN);
       else applyLedState(STATE_GREEN);
+    } else if (led == "live") {
+      if (isToggle) toggleLed(STATE_LIVE);
+      else applyLedState(STATE_LIVE);
     } else if (led == "off") {
       applyLedState(STATE_OFF);
     }
@@ -51,12 +57,10 @@ static void handleSet() {
 
   LedState state = getCurrentState();
   String json = "{\"success\":true,\"active\":\"" + getStateString() + "\","
-                                                                       "\"red\":"
-                + (state == STATE_RED ? "true" : "false") + ","
-                                                            "\"blue\":"
-                + (state == STATE_BLUE ? "true" : "false") + ","
-                                                             "\"green\":"
-                + (state == STATE_GREEN ? "true" : "false") + "}";
+                + "\"red\":" + (state == STATE_RED || state == STATE_LIVE ? "true" : "false") + ","
+                + "\"yellow\":" + (state == STATE_YELLOW || state == STATE_LIVE ? "true" : "false") + ","
+                + "\"blue\":" + (state == STATE_BLUE ? "true" : "false") + ","
+                + "\"green\":" + (state == STATE_GREEN ? "true" : "false") + "}";
   server.send(200, "application/json", json);
 }
 
@@ -67,34 +71,37 @@ static void handleStatus() {
     String led = server.hasArg("led") ? server.arg("led") : server.arg("color");
     led.toLowerCase();
     if (led == "red") applyLedState(STATE_RED);
+    else if (led == "yellow") applyLedState(STATE_YELLOW);
     else if (led == "blue") applyLedState(STATE_BLUE);
     else if (led == "green") applyLedState(STATE_GREEN);
+    else if (led == "live") applyLedState(STATE_LIVE);
     else if (led == "off") applyLedState(STATE_OFF);
-  } else if (server.hasArg("mic") || server.hasArg("cam")) {
+  } else if (server.hasArg("mic") || server.hasArg("cam") || server.hasArg("in_meeting")) {
+    bool inMeeting = server.hasArg("in_meeting") ? (server.arg("in_meeting") == "1" || server.arg("in_meeting") == "true") : true;
     bool mic = server.hasArg("mic") && (server.arg("mic") == "1" || server.arg("mic") == "true");
     bool cam = server.hasArg("cam") && (server.arg("cam") == "1" || server.arg("cam") == "true");
 
-    if (cam) {
+    if (!inMeeting) {
+      applyLedState(STATE_GREEN);
+    } else if (cam && mic) {
+      applyLedState(STATE_LIVE);
+    } else if (cam) {
       applyLedState(STATE_RED);
     } else if (mic) {
-      applyLedState(STATE_BLUE);
+      applyLedState(STATE_YELLOW);
     } else {
-      applyLedState(STATE_GREEN);
+      applyLedState(STATE_BLUE);
     }
   }
 
   LedState state = getCurrentState();
   String json = "{\"active\":\"" + getStateString() + "\","
-                                                      "\"red\":"
-                + (state == STATE_RED ? "true" : "false") + ","
-                                                            "\"blue\":"
-                + (state == STATE_BLUE ? "true" : "false") + ","
-                                                             "\"green\":"
-                + (state == STATE_GREEN ? "true" : "false") + ","
-                                                              "\"ip\":\""
-                + WiFi.localIP().toString() + "\","
-                                              "\"uptimeSeconds\":"
-                + String(millis() / 1000) + "}";
+                + "\"red\":" + (state == STATE_RED || state == STATE_LIVE ? "true" : "false") + ","
+                + "\"yellow\":" + (state == STATE_YELLOW || state == STATE_LIVE ? "true" : "false") + ","
+                + "\"blue\":" + (state == STATE_BLUE ? "true" : "false") + ","
+                + "\"green\":" + (state == STATE_GREEN ? "true" : "false") + ","
+                + "\"ip\":\"" + WiFi.localIP().toString() + "\","
+                + "\"uptimeSeconds\":" + String(millis() / 1000) + "}";
   server.send(200, "application/json", json);
 }
 
