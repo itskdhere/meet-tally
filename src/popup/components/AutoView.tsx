@@ -5,11 +5,11 @@ import {
   IconVideo,
   IconVideoOff,
 } from "@tabler/icons-react";
-import type { AggregatedState, MeetingTab } from "../types";
+import type { AggregatedState, MeetingTab, LedTargetColor } from "../types";
 
 interface Props {
   aggregated?: AggregatedState;
-  targetColor: "red" | "blue" | "green" | "off";
+  targetColor: LedTargetColor;
   tabs?: MeetingTab[];
 }
 
@@ -31,6 +31,25 @@ export const AutoView: React.FC<Props> = ({
     if (p.includes("team") || p.includes("microsoft")) return "platform-teams";
     if (p.includes("zoom")) return "platform-zoom";
     return "platform-generic";
+  };
+
+  const getLedTitle = (color: LedTargetColor) => {
+    switch (color) {
+      case "green":
+        return "Green (Not in Meeting)";
+      case "blue":
+        return "Blue (In Meeting)";
+      case "yellow":
+        return "Yellow (Microphone On)";
+      case "red":
+        return "Red (Camera On)";
+      case "live":
+        return "Red + Yellow (Camera + Microphone)";
+      case "off":
+        return "Off";
+      default:
+        return color;
+    }
   };
 
   return (
@@ -93,9 +112,25 @@ export const AutoView: React.FC<Props> = ({
             </span>
           </div>
 
-          <div className="status-bottom-box led-box">
-            <span className="preview-label">LED Color:</span>
-            <div className={`led-orb ${targetColor}`}></div>
+          <div
+            className="status-bottom-box led-box"
+            title={getLedTitle(targetColor)}
+          >
+            <span className="preview-label">LED:</span>
+            {targetColor === "live" ? (
+              <div className="led-dual-wrap">
+                <div className="led-orb red" title="Red (Camera ON)"></div>
+                <div
+                  className="led-orb yellow"
+                  title="Yellow (Microphone ON)"
+                ></div>
+              </div>
+            ) : (
+              <div
+                className={`led-orb ${targetColor}`}
+                title={getLedTitle(targetColor)}
+              ></div>
+            )}
           </div>
         </div>
 

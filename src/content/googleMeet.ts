@@ -174,6 +174,17 @@ export function parseGoogleMeet(): MeetingState | null {
     }
   }
 
+  const hasEndedScreen =
+    document.querySelector("[data-call-ended]") !== null ||
+    document.querySelector('button[aria-label*="rejoin" i]') !== null ||
+    document.querySelector(
+      'a[href*="meet.google.com"][aria-label*="home" i]'
+    ) !== null;
+
+  if (hasEndedScreen) {
+    return { inMeeting: false, micOn: false, camOn: false };
+  }
+
   const isMeetingUrl =
     /meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}/i.test(
       window.location.href

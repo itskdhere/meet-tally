@@ -1,12 +1,15 @@
 import React from "react";
-import { IconPower } from "@tabler/icons-react";
+import { IconPower, IconBroadcast } from "@tabler/icons-react";
+import type { LedTargetColor } from "../types";
 
 interface Props {
-  manualColor: "red" | "blue" | "green" | "off";
-  onSelectColor: (color: "red" | "blue" | "green" | "off") => void;
+  manualColor: LedTargetColor;
+  onSelectColor: (color: LedTargetColor) => void;
 }
 
 export const ManualView: React.FC<Props> = ({ manualColor, onSelectColor }) => {
+  const isLive = manualColor === "live";
+
   return (
     <section className="view-panel">
       <div className="card manual-card">
@@ -15,10 +18,10 @@ export const ManualView: React.FC<Props> = ({ manualColor, onSelectColor }) => {
           <span className="manual-hint">Select color to light up</span>
         </div>
 
-        <div className="status-dock">
+        <div className="status-dock manual-dock-4">
           <button
-            className={`led-bulb red ${manualColor === "red" ? "active" : ""}`}
-            title="Set LED Red (On-Air)"
+            className={`led-bulb red ${manualColor === "red" || isLive ? "active" : ""}`}
+            title="Set LED Red (Camera On)"
             type="button"
             onClick={() => onSelectColor("red")}
           >
@@ -27,8 +30,18 @@ export const ManualView: React.FC<Props> = ({ manualColor, onSelectColor }) => {
           </button>
 
           <button
+            className={`led-bulb yellow ${manualColor === "yellow" || isLive ? "active" : ""}`}
+            title="Set LED Yellow (Microphone On)"
+            type="button"
+            onClick={() => onSelectColor("yellow")}
+          >
+            <span className="bulb-reflection"></span>
+            <span className="bulb-label">YELLOW</span>
+          </button>
+
+          <button
             className={`led-bulb blue ${manualColor === "blue" ? "active" : ""}`}
-            title="Set LED Blue (Mic Live)"
+            title="Set LED Blue (In Meeting)"
             type="button"
             onClick={() => onSelectColor("blue")}
           >
@@ -38,7 +51,7 @@ export const ManualView: React.FC<Props> = ({ manualColor, onSelectColor }) => {
 
           <button
             className={`led-bulb green ${manualColor === "green" ? "active" : ""}`}
-            title="Set LED Green (Safe / Idle)"
+            title="Set LED Green (Not in Meeting)"
             type="button"
             onClick={() => onSelectColor("green")}
           >
@@ -49,12 +62,22 @@ export const ManualView: React.FC<Props> = ({ manualColor, onSelectColor }) => {
 
         <div className="manual-actions">
           <button
+            className={`btn-live-control ${isLive ? "active" : ""}`}
+            type="button"
+            onClick={() => onSelectColor("live")}
+            title="Set Red + Yellow LED (Camera + Microphone)"
+          >
+            <IconBroadcast size={15} stroke={2} />
+            <span>LIVE (Red + Yellow)</span>
+          </button>
+
+          <button
             className="btn-off-control"
             type="button"
             onClick={() => onSelectColor("off")}
           >
             <IconPower size={14} stroke={2} />
-            Turn Off LEDs
+            <span>Turn Off</span>
           </button>
         </div>
       </div>

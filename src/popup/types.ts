@@ -1,7 +1,15 @@
+export type LedTargetColor =
+  | "red"
+  | "yellow"
+  | "blue"
+  | "green"
+  | "live"
+  | "off";
+
 export interface MeetTallyConfig {
   espUrl: string;
   mode: "auto" | "manual";
-  manualColor: "red" | "blue" | "green" | "off";
+  manualColor: LedTargetColor;
   debugLog: boolean;
 }
 
@@ -34,6 +42,6 @@ export interface PopupState {
   config: MeetTallyConfig;
   connectionState: ConnectionState;
   aggregated: AggregatedState;
-  targetColor: "red" | "blue" | "green" | "off";
+  targetColor: LedTargetColor;
   tabs: MeetingTab[];
 }

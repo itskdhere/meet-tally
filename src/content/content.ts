@@ -35,6 +35,22 @@ import { parseZoomWeb } from "./zoomWeb";
     }
 
     if (!state) {
+      if (lastEvaluatedState.inMeeting) {
+        lastEvaluatedState = {
+          inMeeting: false,
+          micOn: false,
+          camOn: false,
+        };
+        try {
+          chrome.runtime.sendMessage({
+            type: "UPDATE_MEETING_STATUS",
+            platform: detectedPlatform,
+            inMeeting: false,
+            micOn: false,
+            camOn: false,
+          });
+        } catch (err) {}
+      }
       return;
     }
 

@@ -347,21 +347,21 @@ body {
   color: #64748b;
 }
 
-/* Mic Live (Blue) */
+/* Mic On (Yellow/Amber) */
 .sensor-box.mic-live {
-  border-color: rgba(59, 130, 246, 0.4);
-  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.08);
 }
 .sensor-box.mic-live .sensor-icon-wrap {
-  background: var(--accent-blue);
+  background: #f59e0b;
   color: white;
-  box-shadow: 0 0 16px var(--accent-blue-glow);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.45);
 }
 .sensor-box.mic-live .sensor-state {
-  color: #60a5fa;
+  color: #fbbf24;
 }
 
-/* Cam Live (Red) */
+/* Cam On (Red) */
 .sensor-box.cam-live {
   border-color: rgba(239, 68, 68, 0.4);
   background: rgba(239, 68, 68, 0.08);
@@ -406,7 +406,7 @@ body {
   font-weight: 600;
   color: var(--text-muted);
   letter-spacing: 0.3px;
-  margin-right: 20px;
+  margin-right: 14px;
 }
 
 .led-orb {
@@ -416,6 +416,12 @@ body {
   background: #334155;
   border: 2px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.led-dual-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .led-orb.green {
@@ -434,12 +440,28 @@ body {
     0 0 35px var(--accent-blue-glow);
 }
 
+.led-orb.yellow {
+  background: #f59e0b;
+  border-color: #fef08a;
+  box-shadow:
+    0 0 18px #f59e0b,
+    0 0 35px rgba(245, 158, 11, 0.45);
+}
+
 .led-orb.red {
   background: var(--accent-red);
   border-color: #fecaca;
   box-shadow:
     0 0 18px var(--accent-red),
     0 0 35px var(--accent-red-glow);
+}
+
+.led-orb.live {
+  background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
+  border-color: #fef08a;
+  box-shadow:
+    0 0 16px rgba(239, 68, 68, 0.6),
+    0 0 24px rgba(245, 158, 11, 0.5);
 }
 
 .led-orb.off {
@@ -483,20 +505,21 @@ body {
 }
 
 .status-dock {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1.5px solid #334155;
-  border-radius: 36px;
-  padding: 12px 18px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
   display: flex;
   align-items: center;
   justify-content: space-around;
   margin: 8px 0 14px 0;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+  gap: 8px;
 }
 
 .led-bulb {
-  width: 58px;
-  height: 58px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: #1e293b;
   border: 2.5px solid #334155;
@@ -507,6 +530,7 @@ body {
   justify-content: center;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
+  flex-shrink: 0;
 }
 
 .led-bulb:hover {
@@ -530,15 +554,30 @@ body {
 }
 
 .bulb-label {
-  font-size: 9.5px;
+  font-size: 8.5px;
   font-weight: 800;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
   color: #64748b;
   pointer-events: none;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 
-/* Bulb active states */
+/* Red Bulb */
+.led-bulb.red {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(239, 68, 68, 0.12) 0%,
+    #1e293b 85%
+  );
+}
+.led-bulb.red .bulb-label {
+  color: #f87171;
+}
+.led-bulb.red:hover {
+  border-color: rgba(239, 68, 68, 0.75);
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+}
 .led-bulb.red.active {
   background: var(--accent-red);
   border-color: #fca5a5;
@@ -551,6 +590,50 @@ body {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
+/* Yellow Bulb */
+.led-bulb.yellow {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(245, 158, 11, 0.12) 0%,
+    #1e293b 85%
+  );
+}
+.led-bulb.yellow .bulb-label {
+  color: #fbbf24;
+}
+.led-bulb.yellow:hover {
+  border-color: rgba(245, 158, 11, 0.75);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.25);
+}
+.led-bulb.yellow.active {
+  background: #f59e0b;
+  border-color: #fde047;
+  box-shadow:
+    0 0 24px #f59e0b,
+    0 0 45px rgba(245, 158, 11, 0.45);
+}
+.led-bulb.yellow.active .bulb-label {
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Blue Bulb */
+.led-bulb.blue {
+  border-color: rgba(59, 130, 246, 0.4);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(59, 130, 246, 0.12) 0%,
+    #1e293b 85%
+  );
+}
+.led-bulb.blue .bulb-label {
+  color: #60a5fa;
+}
+.led-bulb.blue:hover {
+  border-color: rgba(59, 130, 246, 0.75);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
+}
 .led-bulb.blue.active {
   background: var(--accent-blue);
   border-color: #93c5fd;
@@ -563,6 +646,22 @@ body {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
+/* Green Bulb */
+.led-bulb.green {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(16, 185, 129, 0.12) 0%,
+    #1e293b 85%
+  );
+}
+.led-bulb.green .bulb-label {
+  color: #34d399;
+}
+.led-bulb.green:hover {
+  border-color: rgba(16, 185, 129, 0.75);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+}
 .led-bulb.green.active {
   background: var(--accent-green);
   border-color: #6ee7b7;
@@ -576,23 +675,94 @@ body {
 }
 
 .manual-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn-live-control,
+.btn-broadcast-control {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  width: 100%;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.92)) padding-box,
+    linear-gradient(135deg, #ef4444 0%, #f59e0b 100%) border-box;
+  color: #fbbf24;
+  font-size: 11.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-live-control span,
+.btn-broadcast-control span {
+  background: linear-gradient(90deg, #f87171 0%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+}
+
+.btn-live-control svg,
+.btn-broadcast-control svg {
+  color: #f87171;
+  flex-shrink: 0;
+}
+
+.btn-live-control:hover,
+.btn-broadcast-control:hover {
+  background:
+    linear-gradient(rgba(30, 41, 59, 0.9), rgba(30, 41, 59, 0.9)) padding-box,
+    linear-gradient(135deg, #f87171 0%, #fcd34d 100%) border-box;
+}
+
+.btn-live-control.active,
+.btn-broadcast-control.active {
+  background: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff;
+}
+
+.btn-live-control.active span,
+.btn-broadcast-control.active span {
+  background: none;
+  -webkit-text-fill-color: #ffffff;
+  color: #ffffff;
+}
+
+.btn-live-control.active svg,
+.btn-broadcast-control.active svg {
+  color: #ffffff;
 }
 
 .btn-off-control {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 100%;
   gap: 6px;
-  padding: 8px 16px;
+  padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
   color: #cbd5e1;
   font-size: 11.5px;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.btn-off-control svg {
+  flex-shrink: 0;
 }
 
 .btn-off-control:hover {
@@ -788,6 +958,12 @@ body {
   border-color: rgba(239, 68, 68, 0.3);
 }
 
+.btn-test.test-yellow:hover {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
 .btn-test.test-blue:hover {
   background: rgba(59, 130, 246, 0.15);
   color: #60a5fa;
@@ -798,6 +974,17 @@ body {
   background: rgba(16, 185, 129, 0.15);
   color: #34d399;
   border-color: rgba(16, 185, 129, 0.3);
+}
+
+.btn-test.test-live:hover,
+.btn-test.test-broadcast:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.2),
+    rgba(245, 158, 11, 0.2)
+  );
+  color: #fff;
+  border-color: #f59e0b;
 }
 
 .btn-test.test-off:hover {

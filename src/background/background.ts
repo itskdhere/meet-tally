@@ -1,7 +1,15 @@
+export type LedTargetColor =
+  | "red"
+  | "yellow"
+  | "blue"
+  | "green"
+  | "live"
+  | "off";
+
 export interface MeetTallyConfig {
   espUrl: string;
   mode: "auto" | "manual";
-  manualColor: "red" | "blue" | "green" | "off";
+  manualColor: LedTargetColor;
   debugLog: boolean;
 }
 
@@ -57,8 +65,10 @@ export async function getConfig(): Promise<MeetTallyConfig> {
       mode: data.mode === "manual" ? "manual" : "auto",
       manualColor:
         data.manualColor === "red" ||
+        data.manualColor === "yellow" ||
         data.manualColor === "blue" ||
         data.manualColor === "green" ||
+        data.manualColor === "live" ||
         data.manualColor === "off"
           ? data.manualColor
           : "green",
@@ -111,25 +121,23 @@ export function getAggregatedState() {
 export function resolveTargetColor(
   config: MeetTallyConfig,
   aggregated: ReturnType<typeof getAggregatedState>
-): "red" | "blue" | "green" | "off" {
+): LedTargetColor {
   if (config.mode === "manual") {
     return config.manualColor;
   }
 
-  // Auto Mode Logic:
-  // - Not in a meeting / in a meet but mic and cam both off -> GREEN
-  // - In a meet, camera off, but mic on -> BLUE
-  // - In a meet, camera on (or both on) -> RED
   if (!aggregated.inMeeting) {
     return "green";
   }
 
-  if (aggregated.camOn) {
+  if (aggregated.camOn && aggregated.micOn) {
+    return "live";
+  } else if (aggregated.camOn) {
     return "red";
   } else if (aggregated.micOn) {
-    return "blue";
+    return "yellow";
   } else {
-    return "green";
+    return "blue";
   }
 }
 
@@ -142,10 +150,14 @@ export function updateExtensionBadge(
     chrome.action.setBadgeText({ text: "MAN" });
     if (targetColor === "red") {
       chrome.action.setBadgeBackgroundColor({ color: "#ef4444" });
+    } else if (targetColor === "yellow") {
+      chrome.action.setBadgeBackgroundColor({ color: "#f59e0b" });
     } else if (targetColor === "blue") {
       chrome.action.setBadgeBackgroundColor({ color: "#3b82f6" });
     } else if (targetColor === "green") {
-      chrome.action.setBadgeBackgroundColor({ color: "#22c55e" });
+      chrome.action.setBadgeBackgroundColor({ color: "#10b981" });
+    } else if (targetColor === "live") {
+      chrome.action.setBadgeBackgroundColor({ color: "#ef4444" });
     } else {
       chrome.action.setBadgeBackgroundColor({ color: "#64748b" });
     }
@@ -160,22 +172,22 @@ export function updateExtensionBadge(
   }
 
   if (aggregated.camOn && aggregated.micOn) {
-    chrome.action.setBadgeText({ text: "BOTH" });
+    chrome.action.setBadgeText({ text: "LIVE" });
     chrome.action.setBadgeBackgroundColor({ color: "#ef4444" });
   } else if (aggregated.camOn) {
     chrome.action.setBadgeText({ text: "CAM" });
     chrome.action.setBadgeBackgroundColor({ color: "#ef4444" });
   } else if (aggregated.micOn) {
     chrome.action.setBadgeText({ text: "MIC" });
-    chrome.action.setBadgeBackgroundColor({ color: "#3b82f6" });
+    chrome.action.setBadgeBackgroundColor({ color: "#f59e0b" });
   } else {
-    chrome.action.setBadgeText({ text: "OFF" });
-    chrome.action.setBadgeBackgroundColor({ color: "#22c55e" });
+    chrome.action.setBadgeText({ text: "MEET" });
+    chrome.action.setBadgeBackgroundColor({ color: "#3b82f6" });
   }
 }
 
 export async function syncStatusToESP(
-  overrideColor: "red" | "blue" | "green" | "off" | null = null
+  overrideColor: LedTargetColor | null = null
 ): Promise<boolean> {
   const config = await getConfig();
   const aggregated = getAggregatedState();
@@ -284,17 +296,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       case "UPDATE_MEETING_STATUS": {
         const tabId = sender.tab ? sender.tab.id : null;
         if (tabId !== null && tabId !== undefined) {
-          activeMeetingTabs.set(tabId, {
-            id: tabId,
-            micOn: !!message.micOn,
-            camOn: !!message.camOn,
-            platform: message.platform || "Meeting",
-            title:
-              sender.tab && sender.tab.title
-                ? sender.tab.title
-                : `${message.platform || "Meeting"} Tab`,
-            lastUpdate: Date.now(),
-          });
+          if (message.inMeeting === false) {
+            activeMeetingTabs.delete(tabId);
+          } else {
+            activeMeetingTabs.set(tabId, {
+              id: tabId,
+              micOn: !!message.micOn,
+              camOn: !!message.camOn,
+              platform: message.platform || "Meeting",
+              title:
+                sender.tab && sender.tab.title
+                  ? sender.tab.title
+                  : `${message.platform || "Meeting"} Tab`,
+              lastUpdate: Date.now(),
+            });
+          }
         }
         await syncStatusToESP();
         sendResponse({ success: true, aggregated: getAggregatedState() });

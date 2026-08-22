@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { PopupState } from "../types";
+import type { PopupState, LedTargetColor } from "../types";
 
 export function usePopupState() {
   const [state, setState] = useState<PopupState | null>(null);
@@ -38,7 +38,7 @@ export function usePopupState() {
   );
 
   const setManualColor = useCallback(
-    async (color: "red" | "blue" | "green" | "off") => {
+    async (color: LedTargetColor) => {
       // Optimistic update
       setState((prev) =>
         prev
@@ -96,7 +96,7 @@ export function usePopupState() {
   }, []);
 
   const testHardware = useCallback(
-    async (color: "red" | "blue" | "green" | "off") => {
+    async (color: LedTargetColor) => {
       try {
         await chrome.runtime.sendMessage({ type: "TEST_LED", color });
         await refresh();
