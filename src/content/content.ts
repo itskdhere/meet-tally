@@ -1,5 +1,7 @@
 import { MeetingState } from "./types";
 import { parseGoogleMeet } from "./googleMeet";
+import { parseMicrosoftTeams } from "./microsoftTeams";
+import { parseZoomWeb } from "./zoomWeb";
 
 (() => {
   let lastEvaluatedState: MeetingState = {
@@ -20,79 +22,6 @@ import { parseGoogleMeet } from "./googleMeet";
   }
 
   detectedPlatform = getPlatform();
-
-  // Microsoft Teams
-  function parseMicrosoftTeams(): MeetingState | null {
-    const micBtn = document.querySelector(
-      "#microphone-button, " +
-        'button[aria-label*="mic" i], ' +
-        'button[aria-label*="mute" i], ' +
-        'button[id*="mic-button" i], ' +
-        'button[data-tid*="toggle-mute" i]'
-    );
-
-    const camBtn = document.querySelector(
-      "#video-button, " +
-        'button[aria-label*="camera" i], ' +
-        'button[aria-label*="video" i], ' +
-        'button[id*="video-button" i], ' +
-        'button[data-tid*="toggle-video" i]'
-    );
-
-    if (!micBtn && !camBtn) return null;
-
-    let micOn = false;
-    let camOn = false;
-
-    if (micBtn) {
-      const label = (micBtn.getAttribute("aria-label") || "").toLowerCase();
-      micOn = !label.includes("unmute") && !label.includes("muted");
-    }
-
-    if (camBtn) {
-      const label = (camBtn.getAttribute("aria-label") || "").toLowerCase();
-      camOn =
-        !label.includes("turn camera on") &&
-        !label.includes("camera is off") &&
-        !label.includes("turn on camera");
-    }
-
-    return { inMeeting: true, micOn, camOn };
-  }
-
-  // Zoom Web
-  function parseZoomWeb(): MeetingState | null {
-    const micBtn = document.querySelector(
-      'button[aria-label*="audio" i], ' +
-        'button[aria-label*="mute" i], ' +
-        ".join-dialog"
-    );
-
-    const camBtn = document.querySelector(
-      'button[aria-label*="video" i], ' +
-        'button[aria-label*="start video" i], ' +
-        'button[aria-label*="stop video" i]'
-    );
-
-    if (!micBtn && !camBtn) return null;
-
-    let micOn = false;
-    let camOn = false;
-
-    if (micBtn) {
-      const label = (micBtn.getAttribute("aria-label") || "").toLowerCase();
-      micOn =
-        (label.includes("mute my audio") || label.includes("mute")) &&
-        !label.includes("unmute");
-    }
-
-    if (camBtn) {
-      const label = (camBtn.getAttribute("aria-label") || "").toLowerCase();
-      camOn = label.includes("stop video") || label.includes("turn off camera");
-    }
-
-    return { inMeeting: true, micOn, camOn };
-  }
 
   function evaluateMeetingState() {
     let state: MeetingState | null = null;
