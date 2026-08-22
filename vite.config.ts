@@ -4,12 +4,14 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import zip from "vite-plugin-zip-pack";
 import manifest from "./manifest.config.js";
-import { name, version } from "./package.json";
+import pkg from "./package.json" with { type: "json" };
+
+const { name, version } = pkg;
 
 export default defineConfig({
   resolve: {
     alias: {
-      "@": `${path.resolve(__dirname, "src")}`,
+      "@": `${path.resolve(import.meta.dirname, "src")}`,
     },
   },
   plugins: [
