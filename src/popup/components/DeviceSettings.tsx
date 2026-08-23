@@ -86,7 +86,7 @@ export const DeviceSettings: React.FC<Props> = ({
       case "saving":
         return (
           <>
-            <span className="btn-spinner" />
+            <span className="w-3 h-3 border-2 border-white/25 border-t-white rounded-full animate-spin shrink-0" />
             <span>Saving...</span>
           </>
         );
@@ -119,7 +119,7 @@ export const DeviceSettings: React.FC<Props> = ({
       case "pinging":
         return (
           <>
-            <span className="btn-spinner" />
+            <span className="w-3 h-3 border-2 border-white/25 border-t-white rounded-full animate-spin shrink-0" />
             <span>Pinging...</span>
           </>
         );
@@ -147,17 +147,37 @@ export const DeviceSettings: React.FC<Props> = ({
     }
   };
 
+  const getPingStyles = () => {
+    if (pingState.status === "success") {
+      return "bg-emerald-500/15 text-emerald-400 border-emerald-500/35";
+    }
+    if (pingState.status === "fail") {
+      return "bg-red-500/15 text-red-400 border-red-500/35";
+    }
+    return "bg-white/5 text-slate-300 border-white/10 hover:enabled:bg-white/10 hover:enabled:text-white hover:enabled:border-white/20";
+  };
+
+  const getSaveStyles = () => {
+    if (saveStatus === "saved") {
+      return "bg-emerald-500/15 text-emerald-400 border-emerald-500/35";
+    }
+    if (saveStatus === "error") {
+      return "bg-red-500/15 text-red-400 border-red-500/35";
+    }
+    return "bg-white/5 text-slate-300 border-white/10 hover:enabled:bg-white/10 hover:enabled:text-white hover:enabled:border-white/20";
+  };
+
   return (
-    <section className="card config-card">
-      <div className="config-header">
+    <section className="bg-gray-900/75 backdrop-blur-md border border-white/8 hover:border-white/16 rounded-2xl p-3.5 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] transition-colors duration-200 flex flex-col gap-2.5">
+      <div className="flex items-center gap-1.5 text-[11.5px] font-semibold text-slate-300">
         <IconSettings size={15} stroke={2} />
         <span>Device mDNS / IP Address:</span>
       </div>
 
-      <div className="input-group">
+      <div className="w-full">
         <input
           type="text"
-          className="config-input"
+          className="w-full bg-slate-900/80 border border-white/10 rounded-lg px-3 py-2 text-slate-50 text-xs outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
           value={urlInput}
           placeholder="http://meet-tally.local"
           spellCheck={false}
@@ -171,17 +191,9 @@ export const DeviceSettings: React.FC<Props> = ({
         />
       </div>
 
-      <div className="config-btn-row">
+      <div className="grid grid-cols-2 gap-2">
         <button
-          className={`btn-ping ${
-            pingState.status === "success"
-              ? "btn-ping-success"
-              : pingState.status === "fail"
-                ? "btn-ping-fail"
-                : pingState.status === "pinging"
-                  ? "btn-ping-active"
-                  : ""
-          }`}
+          className={`inline-flex items-center justify-center gap-1.5 py-2 px-2.5 border rounded-lg text-[11.5px] font-semibold cursor-pointer transition-all duration-200 active:enabled:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap overflow-hidden text-ellipsis ${getPingStyles()}`}
           type="button"
           disabled={pingState.status === "pinging"}
           onClick={handlePing}
@@ -190,13 +202,7 @@ export const DeviceSettings: React.FC<Props> = ({
         </button>
 
         <button
-          className={`btn-save ${
-            saveStatus === "saved"
-              ? "btn-save-success"
-              : saveStatus === "error"
-                ? "btn-save-error"
-                : ""
-          }`}
+          className={`inline-flex items-center justify-center gap-1.5 py-2 px-3.5 border rounded-lg text-[11.5px] font-semibold cursor-pointer transition-all duration-200 active:enabled:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed ${getSaveStyles()}`}
           title="Save Device URL"
           type="button"
           disabled={saveStatus === "saving"}
@@ -206,7 +212,7 @@ export const DeviceSettings: React.FC<Props> = ({
         </button>
       </div>
 
-      <div className="config-status-row">
+      <div className="w-full flex pt-0.5">
         <ConnectionBadge connectionState={connectionState} />
       </div>
     </section>

@@ -16,7 +16,7 @@ export const App: React.FC = () => {
   const targetColor = state?.targetColor || "green";
 
   return (
-    <div className="app-container">
+    <div className="p-4 flex flex-col gap-3 min-h-130 box-border">
       <Header />
 
       <ModeSwitcher mode={mode} onModeChange={setMode} />
