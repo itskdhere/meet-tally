@@ -28,14 +28,6 @@ void applyLedState(LedState state) {
   digitalWrite(PIN_GREEN, greenOn ? onLevel : offLevel);
 }
 
-void toggleLed(LedState state) {
-  if (currentState == state) {
-    applyLedState(STATE_OFF);
-  } else {
-    applyLedState(state);
-  }
-}
-
 LedState getCurrentState() {
   return currentState;
 }

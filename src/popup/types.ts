@@ -19,7 +19,6 @@ export interface ConnectionState {
   lastSyncTime: number | null;
   lastLatency: number | null;
   lastError: string | null;
-  lastSentColor: string | null;
 }
 
 export interface AggregatedState {

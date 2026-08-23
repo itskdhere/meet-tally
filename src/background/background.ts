@@ -28,7 +28,6 @@ export interface ConnectionState {
   lastSyncTime: number | null;
   lastLatency: number | null;
   lastError: string | null;
-  lastSentColor: string | null;
 }
 
 const DEFAULT_CONFIG: MeetTallyConfig = {
@@ -46,10 +45,9 @@ const connectionState: ConnectionState = {
   lastSyncTime: null,
   lastLatency: null,
   lastError: null,
-  lastSentColor: null,
 };
 
-export async function getConfig(): Promise<MeetTallyConfig> {
+async function getConfig(): Promise<MeetTallyConfig> {
   try {
     const data = (await chrome.storage.sync.get([
       "espUrl",
@@ -84,7 +82,7 @@ export async function getConfig(): Promise<MeetTallyConfig> {
   }
 }
 
-export async function saveConfig(
+async function saveConfig(
   partial: Partial<MeetTallyConfig>
 ): Promise<MeetTallyConfig> {
   const current = await getConfig();
@@ -101,7 +99,7 @@ export async function saveConfig(
   return updated;
 }
 
-export function getAggregatedState() {
+function getAggregatedState() {
   let mic = false;
   let cam = false;
   let platform = "No Active Meeting";
@@ -122,7 +120,7 @@ export function getAggregatedState() {
   };
 }
 
-export function resolveTargetColor(
+function resolveTargetColor(
   config: MeetTallyConfig,
   aggregated: ReturnType<typeof getAggregatedState>
 ): LedTargetColor {
@@ -145,7 +143,7 @@ export function resolveTargetColor(
   }
 }
 
-export function updateExtensionBadge(
+function updateExtensionBadge(
   targetColor: string,
   mode: "auto" | "manual",
   aggregated: ReturnType<typeof getAggregatedState>,
@@ -200,7 +198,7 @@ export function updateExtensionBadge(
   }
 }
 
-export async function syncStatusToESP(
+async function syncStatusToESP(
   overrideColor: LedTargetColor | null = null
 ): Promise<boolean> {
   const config = await getConfig();
@@ -234,7 +232,6 @@ export async function syncStatusToESP(
       connectionState.lastSyncTime = Date.now();
       connectionState.lastLatency = latency;
       connectionState.lastError = null;
-      connectionState.lastSentColor = targetColor;
       if (config.debugLog) {
         console.log(
           `[MeetTally] Synced LED=${targetColor} (mode=${config.mode}) -> ESP OK (${latency}ms)`
@@ -259,25 +256,6 @@ export async function syncStatusToESP(
     }
     return false;
   }
-}
-
-export async function sendHeartbeat() {
-  const config = await getConfig();
-  if (!config.enabled) return;
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000);
-    const res = await fetch(`${config.espUrl}/heartbeat`, {
-      method: "GET",
-      cache: "no-store",
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-    if (res.ok) {
-      connectionState.status = "connected";
-      connectionState.lastSyncTime = Date.now();
-    }
-  } catch (e) {}
 }
 
 chrome.alarms.create("meet_tally_alarm", { periodInMinutes: 0.05 }); // ~3s
@@ -429,13 +407,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 : err.message || "Connection failed",
           });
         }
-        break;
-      }
-
-      case "TEST_LED": {
-        const color = message.color;
-        const success = await syncStatusToESP(color);
-        sendResponse({ success, color });
         break;
       }
 

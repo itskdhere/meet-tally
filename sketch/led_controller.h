@@ -14,8 +14,6 @@ void initLeds();
 
 void applyLedState(LedState state);
 
-void toggleLed(LedState state);
-
 LedState getCurrentState();
 
 String getStateString();

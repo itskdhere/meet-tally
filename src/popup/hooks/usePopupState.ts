@@ -120,18 +120,6 @@ export function usePopupState() {
     }
   }, []);
 
-  const testHardware = useCallback(
-    async (color: LedTargetColor) => {
-      try {
-        await chrome.runtime.sendMessage({ type: "TEST_LED", color });
-        await refresh();
-      } catch (err) {
-        console.error("Test LED error:", err);
-      }
-    },
-    [refresh]
-  );
-
   useEffect(() => {
     refresh();
     const interval = setInterval(refresh, 1200);
@@ -145,7 +133,5 @@ export function usePopupState() {
     setEnabled,
     saveConfig,
     testPing,
-    testHardware,
-    refresh,
   };
 }
