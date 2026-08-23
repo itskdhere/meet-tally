@@ -8,16 +8,17 @@ import { DeviceSettings } from "./components/DeviceSettings";
 import { Footer } from "./components/Footer";
 
 export const App: React.FC = () => {
-  const { state, setMode, setManualColor, saveConfig, testPing } =
+  const { state, setMode, setManualColor, setEnabled, saveConfig, testPing } =
     usePopupState();
 
+  const enabled = state?.config?.enabled !== false;
   const mode = state?.config?.mode || "auto";
   const manualColor = state?.config?.manualColor || "green";
   const targetColor = state?.targetColor || "green";
 
   return (
     <div className="p-4 flex flex-col gap-3 min-h-130 box-border">
-      <Header />
+      <Header enabled={enabled} onToggleEnabled={setEnabled} />
 
       <ModeSwitcher mode={mode} onModeChange={setMode} />
 
@@ -34,6 +35,7 @@ export const App: React.FC = () => {
       <DeviceSettings
         espUrl={state?.config?.espUrl}
         connectionState={state?.connectionState}
+        enabled={enabled}
         onSaveUrl={saveConfig}
         onPing={testPing}
       />

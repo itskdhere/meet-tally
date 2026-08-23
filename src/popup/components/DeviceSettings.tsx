@@ -13,6 +13,7 @@ import type { ConnectionState } from "../types";
 interface Props {
   espUrl?: string;
   connectionState?: ConnectionState;
+  enabled?: boolean;
   onSaveUrl: (url: string) => Promise<boolean>;
   onPing: (
     url: string
@@ -22,6 +23,7 @@ interface Props {
 export const DeviceSettings: React.FC<Props> = ({
   espUrl = "http://meet-tally.local",
   connectionState,
+  enabled = true,
   onSaveUrl,
   onPing,
 }) => {
@@ -213,7 +215,7 @@ export const DeviceSettings: React.FC<Props> = ({
       </div>
 
       <div className="w-full flex pt-0.5">
-        <ConnectionBadge connectionState={connectionState} />
+        <ConnectionBadge connectionState={connectionState} enabled={enabled} />
       </div>
     </section>
   );

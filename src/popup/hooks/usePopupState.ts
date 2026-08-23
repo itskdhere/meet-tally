@@ -63,6 +63,31 @@ export function usePopupState() {
     [refresh]
   );
 
+  const setEnabled = useCallback(
+    async (enabled: boolean) => {
+      // Optimistic update
+      setState((prev) =>
+        prev
+          ? {
+              ...prev,
+              config: { ...prev.config, enabled },
+            }
+          : prev
+      );
+
+      try {
+        await chrome.runtime.sendMessage({
+          type: "SET_ENABLED",
+          enabled,
+        });
+        await refresh();
+      } catch (err) {
+        console.error("Failed to set enabled state:", err);
+      }
+    },
+    [refresh]
+  );
+
   const saveConfig = useCallback(
     async (espUrl: string) => {
       try {
@@ -117,6 +142,7 @@ export function usePopupState() {
     state,
     setMode,
     setManualColor,
+    setEnabled,
     saveConfig,
     testPing,
     testHardware,

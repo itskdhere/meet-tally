@@ -3,15 +3,24 @@ import type { ConnectionState } from "../types";
 
 interface Props {
   connectionState?: ConnectionState;
+  enabled?: boolean;
 }
 
-export const ConnectionBadge: React.FC<Props> = ({ connectionState }) => {
+export const ConnectionBadge: React.FC<Props> = ({
+  connectionState,
+  enabled = true,
+}) => {
   let badgeStyles = "bg-slate-500/15 text-slate-400 border-slate-500/30";
   let dotStyles = "bg-slate-400";
   let text = "STANDBY";
   let title = "Device Connection Status";
 
-  if (connectionState) {
+  if (!enabled) {
+    badgeStyles = "bg-slate-500/15 text-slate-400 border-slate-500/30";
+    dotStyles = "bg-slate-500";
+    text = "SYNC PAUSED (DISABLED IN THIS PROFILE)";
+    title = "Extension status syncing is disabled in this Chrome profile";
+  } else if (connectionState) {
     if (connectionState.status === "connected") {
       badgeStyles = "bg-emerald-500/15 text-emerald-400 border-emerald-500/30";
       dotStyles = "bg-emerald-500 shadow-[0_0_8px_#10b981] animate-pulse-dot";

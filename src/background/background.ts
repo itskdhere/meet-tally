@@ -11,6 +11,7 @@ export interface MeetTallyConfig {
   mode: "auto" | "manual";
   manualColor: LedTargetColor;
   debugLog: boolean;
+  enabled: boolean;
 }
 
 export interface MeetingTab {
@@ -35,6 +36,7 @@ const DEFAULT_CONFIG: MeetTallyConfig = {
   mode: "auto",
   manualColor: "green",
   debugLog: true,
+  enabled: true,
 };
 
 const activeMeetingTabs = new Map<number, MeetingTab>();
@@ -54,6 +56,7 @@ export async function getConfig(): Promise<MeetTallyConfig> {
       "mode",
       "manualColor",
       "debugLog",
+      "enabled",
     ])) as Partial<MeetTallyConfig>;
     let url = (data.espUrl || DEFAULT_CONFIG.espUrl).trim();
     if (!/^https?:\/\//i.test(url)) {
@@ -73,6 +76,7 @@ export async function getConfig(): Promise<MeetTallyConfig> {
           ? data.manualColor
           : "green",
       debugLog: data.debugLog ?? true,
+      enabled: data.enabled !== undefined ? Boolean(data.enabled) : true,
     };
   } catch (err) {
     console.warn("[MeetTally] Failed to read storage:", err);
@@ -144,8 +148,18 @@ export function resolveTargetColor(
 export function updateExtensionBadge(
   targetColor: string,
   mode: "auto" | "manual",
-  aggregated: ReturnType<typeof getAggregatedState>
+  aggregated: ReturnType<typeof getAggregatedState>,
+  enabled: boolean = true
 ) {
+  if (!enabled) {
+    chrome.action.setBadgeText({ text: "OFF" });
+    chrome.action.setBadgeBackgroundColor({ color: "#64748b" });
+    chrome.action.setTitle({ title: "Meet Tally (Disabled in this profile)" });
+    return;
+  }
+
+  chrome.action.setTitle({ title: "Meet Tally - Active" });
+
   if (mode === "manual") {
     chrome.action.setBadgeText({ text: "MAN" });
     if (targetColor === "red") {
@@ -193,7 +207,12 @@ export async function syncStatusToESP(
   const aggregated = getAggregatedState();
   const targetColor = overrideColor || resolveTargetColor(config, aggregated);
 
-  updateExtensionBadge(targetColor, config.mode, aggregated);
+  updateExtensionBadge(targetColor, config.mode, aggregated, config.enabled);
+
+  if (!config.enabled) {
+    connectionState.status = "idle";
+    return false;
+  }
 
   const endpoint = `${config.espUrl}/set?led=${targetColor}`;
   const startTime = Date.now();
@@ -244,6 +263,7 @@ export async function syncStatusToESP(
 
 export async function sendHeartbeat() {
   const config = await getConfig();
+  if (!config.enabled) return;
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 2000);
@@ -364,6 +384,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       case "SAVE_CONFIG": {
         const updated = await saveConfig({ espUrl: message.espUrl });
+        sendResponse({ success: true, config: updated });
+        break;
+      }
+
+      case "SET_ENABLED": {
+        const enabled = message.enabled !== false;
+        const updated = await saveConfig({ enabled });
         sendResponse({ success: true, config: updated });
         break;
       }

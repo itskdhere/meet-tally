@@ -11,6 +11,7 @@ export interface MeetTallyConfig {
   mode: "auto" | "manual";
   manualColor: LedTargetColor;
   debugLog: boolean;
+  enabled?: boolean;
 }
 
 export interface ConnectionState {
