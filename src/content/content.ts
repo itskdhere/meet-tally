@@ -15,7 +15,12 @@ import { parseZoomWeb } from "./zoomWeb";
   function getPlatform(): string {
     const host = window.location.hostname.toLowerCase();
     if (host.includes("meet.google.com")) return "Google Meet";
-    if (host.includes("teams.microsoft.com") || host.includes("teams.live.com"))
+    if (
+      host.includes("teams.microsoft.com") ||
+      host.includes("teams.live.com") ||
+      host.includes("teams.cloud.microsoft") ||
+      host.includes("teams.")
+    )
       return "Microsoft Teams";
     if (host.includes("zoom.us")) return "Zoom Web";
     return "Web Meeting";
@@ -89,6 +94,7 @@ import { parseZoomWeb } from "./zoomWeb";
       "data-is-muted",
       "aria-label",
       "aria-pressed",
+      "aria-checked",
       "class",
       "data-tooltip",
       "data-tid",
