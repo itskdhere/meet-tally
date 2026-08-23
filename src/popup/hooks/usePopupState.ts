@@ -1,8 +1,28 @@
 import { useCallback, useEffect, useState } from "react";
 import type { PopupState, LedTargetColor } from "../types";
 
+const CACHE_KEY = "meet_tally_popup_state";
+
+function getCachedState(): PopupState | null {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch {}
+  return null;
+}
+
+function setCachedState(state: PopupState | null) {
+  try {
+    if (state) {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(state));
+    }
+  } catch {}
+}
+
 export function usePopupState() {
-  const [state, setState] = useState<PopupState | null>(null);
+  const [state, setState] = useState<PopupState | null>(getCachedState);
 
   const refresh = useCallback(async () => {
     try {
@@ -10,7 +30,9 @@ export function usePopupState() {
         type: "GET_POPUP_STATE",
       });
       if (response && response.config) {
-        setState(response as PopupState);
+        const popupState = response as PopupState;
+        setState(popupState);
+        setCachedState(popupState);
       }
     } catch {}
   }, []);
@@ -18,14 +40,16 @@ export function usePopupState() {
   const setMode = useCallback(
     async (mode: "auto" | "manual") => {
       // Optimistic update
-      setState((prev) =>
-        prev
+      setState((prev) => {
+        const next = prev
           ? {
               ...prev,
               config: { ...prev.config, mode },
             }
-          : prev
-      );
+          : prev;
+        setCachedState(next);
+        return next;
+      });
 
       try {
         await chrome.runtime.sendMessage({ type: "SET_MODE", mode });
@@ -40,15 +64,21 @@ export function usePopupState() {
   const setManualColor = useCallback(
     async (color: LedTargetColor) => {
       // Optimistic update
-      setState((prev) =>
-        prev
+      setState((prev) => {
+        const next = prev
           ? {
               ...prev,
-              config: { ...prev.config, mode: "manual", manualColor: color },
+              config: {
+                ...prev.config,
+                mode: "manual" as const,
+                manualColor: color,
+              },
               targetColor: color,
             }
-          : prev
-      );
+          : prev;
+        setCachedState(next);
+        return next;
+      });
 
       try {
         await chrome.runtime.sendMessage({
@@ -66,14 +96,16 @@ export function usePopupState() {
   const setEnabled = useCallback(
     async (enabled: boolean) => {
       // Optimistic update
-      setState((prev) =>
-        prev
+      setState((prev) => {
+        const next = prev
           ? {
               ...prev,
               config: { ...prev.config, enabled },
             }
-          : prev
-      );
+          : prev;
+        setCachedState(next);
+        return next;
+      });
 
       try {
         await chrome.runtime.sendMessage({
