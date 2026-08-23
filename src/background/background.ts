@@ -280,7 +280,7 @@ chrome.tabs.onRemoved.addListener(async (tabId) => {
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
   if (changeInfo.url && activeMeetingTabs.has(tabId)) {
     const isMeetingUrl =
-      /meet\.google\.com|teams\.microsoft\.com|teams\.live\.com|teams\.cloud\.microsoft|zoom\.us/i.test(
+      /meet\.google\.com|teams\.microsoft\.com|teams\.live\.com|teams\.cloud\.microsoft/i.test(
         changeInfo.url
       );
     if (!isMeetingUrl) {

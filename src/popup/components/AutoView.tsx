@@ -29,7 +29,6 @@ export const AutoView: React.FC<Props> = ({
     const p = platform.toLowerCase();
     if (p.includes("meet") || p.includes("google")) return "platform-meet";
     if (p.includes("team") || p.includes("microsoft")) return "platform-teams";
-    if (p.includes("zoom")) return "platform-zoom";
     return "platform-generic";
   };
 

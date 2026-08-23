@@ -1,7 +1,6 @@
 import { MeetingState } from "./types";
 import { parseGoogleMeet } from "./googleMeet";
 import { parseMicrosoftTeams } from "./microsoftTeams";
-import { parseZoomWeb } from "./zoomWeb";
 
 (() => {
   let lastEvaluatedState: MeetingState = {
@@ -22,7 +21,6 @@ import { parseZoomWeb } from "./zoomWeb";
       host.includes("teams.")
     )
       return "Microsoft Teams";
-    if (host.includes("zoom.us")) return "Zoom Web";
     return "Web Meeting";
   }
 
@@ -35,8 +33,6 @@ import { parseZoomWeb } from "./zoomWeb";
       state = parseGoogleMeet();
     } else if (detectedPlatform === "Microsoft Teams") {
       state = parseMicrosoftTeams();
-    } else if (detectedPlatform === "Zoom Web") {
-      state = parseZoomWeb();
     }
 
     if (!state) {

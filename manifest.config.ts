@@ -42,7 +42,6 @@ export default defineManifest({
         "https://*.teams.live.com/*",
         "https://teams.cloud.microsoft/*",
         "https://*.teams.cloud.microsoft/*",
-        "https://*.zoom.us/*",
       ],
       all_frames: true,
       run_at: "document_idle",
