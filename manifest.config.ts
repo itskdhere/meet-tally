@@ -6,7 +6,7 @@ export default defineManifest({
   name: "Meet Tally",
   version: pkg.version,
   description:
-    "Physical Meeting & Mic./Cam. Status Indicator for Google Meet, MS Teams, and Zoom",
+    "A real-time physical and digital tally light for Google Meet & Microsoft Teams, indicating microphone, camera, and meeting status.",
   icons: {
     16: "public/logo.png",
     32: "public/logo.png",
