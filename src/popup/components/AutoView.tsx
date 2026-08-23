@@ -86,7 +86,7 @@ export const AutoView: React.FC<Props> = ({
 
         <div className="grid grid-cols-2 gap-2.5 mb-3">
           <div
-            className={`rounded-xl p-3 flex items-center gap-2.5 transition-all duration-250 border ${
+            className={`rounded-xl p-3 h-16 flex items-center gap-2.5 transition-all duration-250 border box-border ${
               aggregated.micOn
                 ? "border-amber-500/40 bg-amber-500/8"
                 : "border-white/6 bg-slate-900/60"
@@ -120,7 +120,7 @@ export const AutoView: React.FC<Props> = ({
           </div>
 
           <div
-            className={`rounded-xl p-3 flex items-center gap-2.5 transition-all duration-250 border ${
+            className={`rounded-xl p-3 h-16 flex items-center gap-2.5 transition-all duration-250 border box-border ${
               aggregated.camOn
                 ? "border-red-500/40 bg-red-500/8"
                 : "border-white/6 bg-slate-900/60"
@@ -155,9 +155,9 @@ export const AutoView: React.FC<Props> = ({
         </div>
 
         <div className="grid grid-cols-2 gap-2.5">
-          <div className="bg-slate-900/85 border border-white/8 rounded-xl px-3 py-2 flex items-center justify-center min-h-10 box-border">
+          <div className="bg-slate-900/85 border border-white/8 rounded-xl px-3 h-10 flex items-center justify-center box-border">
             <span
-              className={`text-[11px] font-semibold px-2.5 py-1 rounded-full whitespace-nowrap overflow-hidden text-ellipsis max-w-full text-center transition-all duration-250 border ${getPlatformStyles(
+              className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap overflow-hidden text-ellipsis max-w-full text-center transition-all duration-250 border ${getPlatformStyles(
                 aggregated.platform
               )}`}
             >
@@ -168,7 +168,7 @@ export const AutoView: React.FC<Props> = ({
           </div>
 
           <div
-            className="bg-slate-900/85 border border-white/8 rounded-xl px-3 py-2 flex items-center justify-evenly min-h-10 box-border"
+            className="bg-slate-900/85 border border-white/8 rounded-xl px-3 h-10 flex items-center justify-evenly box-border"
             title={getLedTitle(targetColor)}
           >
             <span className="text-xs font-semibold text-gray-400 tracking-wide">
