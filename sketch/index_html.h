@@ -95,15 +95,7 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
       border: 3px solid #334155;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
-      cursor: pointer;
-    }
-
-    .led-bulb:hover {
-      transform: scale(1.06);
-    }
-
-    .led-bulb:active {
-      transform: scale(0.96);
+      cursor: default;
     }
 
     .led-bulb::after {
@@ -159,14 +151,14 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
   <div class="container">
     <div class="header">
       <h1>Meet Tally</h1>
-      <p>Controller and Status Indicator</p>
+      <p>Status Indicator</p>
     </div>
 
     <div class="status-dock">
-      <div id="bulb-red" class="led-bulb red" onclick="setLed('red')" title="Toggle Red (Camera Only)"></div>
-      <div id="bulb-yellow" class="led-bulb yellow" onclick="setLed('yellow')" title="Toggle Yellow (Microphone Only)"></div>
-      <div id="bulb-blue" class="led-bulb blue" onclick="setLed('blue')" title="Toggle Blue (In Meeting)"></div>
-      <div id="bulb-green" class="led-bulb green" onclick="setLed('green')" title="Toggle Green (Idle)"></div>
+      <div id="bulb-red" class="led-bulb red" title="Red (Camera Active)"></div>
+      <div id="bulb-yellow" class="led-bulb yellow" title="Yellow (Microphone Active)"></div>
+      <div id="bulb-blue" class="led-bulb blue" title="Blue (In Meeting)"></div>
+      <div id="bulb-green" class="led-bulb green" title="Green (Idle)"></div>
     </div>
 
     <div class="footer">
@@ -175,18 +167,6 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
   </div>
 
   <script>
-    async function setLed(color) {
-      try {
-        const response = await fetch(`/set?led=${color}`);
-        if (response.ok) {
-          const data = await response.json();
-          updateUI(data.active);
-        }
-      } catch (err) {
-        console.error("Error communicating with ESP8266:", err);
-      }
-    }
-
     function updateUI(state) {
       const isRed = state === 'red' || state === 'live';
       const isYellow = state === 'yellow' || state === 'live';
@@ -211,7 +191,10 @@ const char INDEX_HTML[] PROGMEM = R"rawliteral(
       }
     }
 
-    window.addEventListener('DOMContentLoaded', fetchStatus);
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchStatus();
+      setInterval(fetchStatus, 1000);
+    });
   </script>
 </body>
 </html>
