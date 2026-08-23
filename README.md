@@ -9,14 +9,43 @@
 </h4>
 
 <p align="center">
-  <a href="https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3">
-    <img alt="Chrome Extension" src="https://img.shields.io/badge/Manifest-v3-4285F4?logo=chromewebstore&logoColor=white">
+  <a href="https://github.com/itskdhere/meet-tally/releases/latest">
+    <img alt="GitHub Release" src="https://img.shields.io/github/v/release/itskdhere/meet-tally?logo=semver&label=Release">
   </a>
   &nbsp;
-  <a href="https://github.com/itskdhere/meet-tally/releases/latest">
-    <img alt="GitHub Release" src="https://img.shields.io/github/v/release/itskdhere/meet-tally?display_name=tag&logo=semver&label=Release">
+  <a href="https://developer.chrome.com/docs/extensions/develop/migrate/what-is-mv3">
+    <img alt="Chrome Extension" src="https://img.shields.io/badge/Manifest-V3-34A853?logo=googlechrome&logoColor=white">
+  </a>
+  &nbsp;
+  <a href="LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/itskdhere/meet-tally?logo=gplv3&label=License">
   </a>
 </p>
+<br>
+
+#### Table of Contents
+
+- [Overview](#-overview)
+- [Key Features](#-key-features)
+  - [Intelligent Meeting Detection](#1-intelligent-meeting-detection)
+  - [Browser Extension Popup UI](#2-browser-extension-popup-ui)
+  - [Hardware Firmware (ESP8266)](#3-hardware-firmware-esp8266)
+- [LED Status Matrix](#-led-status-matrix)
+- [Tech Stack](#-tech-stack)
+  - [Chrome Extension](#chrome-extension)
+  - [Microcontroller Firmware](#microcontroller-firmware)
+- [Hardware Setup & Wiring](#-hardware-setup--wiring)
+  - [Required Components](#required-components)
+  - [Default Pinout Configuration (ESP8266)](#default-pinout-configuration-esp8266)
+- [Getting Started](#-getting-started)
+  - [Flash the ESP8266 Firmware](#1-flash-the-esp8266-firmware)
+  - [Install the Chrome Extension](#2-install-the-chrome-extension)
+- [REST API Reference](#-rest-api-reference)
+  - [Set LED State](#1-set-led-state)
+  - [Get Device Status](#2-get-device-status)
+- [Repository Structure](#-repository-structure)
+- [Permissions & Security](#-permissions--security)
+- [License](#-license)
 
 ## 📌 Overview
 
@@ -34,6 +63,7 @@
 ### 2. Browser Extension Popup UI
 
 - Built with **React 19**, **TypeScript**, and **Tailwind CSS v4** in a sleek glassmorphic dark theme.
+- **Profile Toggle Switch**: Instant ON/OFF power switch in the header to pause or resume hardware sync per browser profile.
 - **Auto Detection View**: Live monitoring of microphone, camera, active platform, and connected tabs.
 - **Manual Override View**: Click-to-activate physical LEDs (Red, Yellow, Blue, Green, Live Red+Yellow, or Off).
 - **Device Management**: Input custom mDNS hostnames or IP addresses with real-time ping latency tests and connection health diagnostics.
@@ -54,10 +84,10 @@
 | 🔵 **Blue**     |     `PIN_BLUE` (D2)      | In meeting, Camera OFF, Mic OFF | `MEET` (Blue)  | **In Meeting (Muted / Listening)** |
 | 🟡 **Yellow**   |    `PIN_YELLOW` (D5)     | In meeting, Camera OFF, Mic ON  | `MIC` (Yellow) | **Speaking / Mic Active**          |
 | 🔴 **Red**      |      `PIN_RED` (D6)      | In meeting, Camera ON, Mic OFF  |  `CAM` (Red)   | **On Video / Camera Active**       |
-| 🔴🟡 **LIVE**   | `PIN_RED` + `PIN_YELLOW` | In meeting, Camera ON, Mic ON   |  `LIVE` (Red)  | **On Air / Live (Video + Audio)**  |
-| ⚫ **Off**      |       All Pins Low       | Manual shutdown                 |  `MAN` (Gray)  | **Disabled / Standby**             |
+| 🔴🟡 **Live**   | `PIN_RED` + `PIN_YELLOW` | In meeting, Camera ON, Mic ON   |  `LIVE` (Red)  | **On Air / Live (Video + Audio)**  |
+| ⚫ **Off**      |       All Pins Low       | Manual shutdown / Disabled      | `MAN` / `OFF`  | **Disabled / Standby**             |
 
-## 🛠️ Tech Stack
+## 🛠 Tech Stack
 
 ### Chrome Extension
 
@@ -85,13 +115,13 @@
 
 ### Default Pinout Configuration (ESP8266)
 
-| LED Color     | NodeMCU / Wemos Pin | ESP8266 GPIO | Purpose               |
-| :------------ | :-----------------: | :----------: | :-------------------- |
-| 🟢 **Green**  |       **D1**        |   `GPIO5`    | Idle / Not in Meeting |
-| 🔵 **Blue**   |       **D2**        |   `GPIO4`    | In Meeting (Muted)    |
-| 🟡 **Yellow** |       **D5**        |   `GPIO14`   | Microphone Active     |
-| 🔴 **Red**    |       **D6**        |   `GPIO12`   | Camera Active         |
-| ⏚ **GND**     |       **GND**       |    Ground    | Common Ground         |
+| LED Color        | NodeMCU / Wemos Pin | ESP8266 GPIO | Purpose               |
+| :--------------- | :-----------------: | :----------: | :-------------------- |
+| 🟢 **Green**     |       **D1**        |   `GPIO5`    | Idle / Not in Meeting |
+| 🔵 **Blue**      |       **D2**        |   `GPIO4`    | In Meeting (Muted)    |
+| 🟡 **Yellow**    |       **D5**        |   `GPIO14`   | Microphone Active     |
+| 🔴 **Red**       |       **D6**        |   `GPIO12`   | Camera Active         |
+| ⏚ &nbsp; **GND** |       **GND**       |    Ground    | Common Ground         |
 
 > [!TIP]
 > Pin assignments can be customized in [`sketch/config.h`](file:///sketch/config.h). If using a 5V relay module with Active LOW triggers, set `LED_ACTIVE_HIGH = false` in `config.h`. For wiring, you can use a single 220Ω–330Ω resistor on the common GND rail (or individual resistors on each LED).
@@ -111,42 +141,55 @@
 5. Upload the sketch.
 6. Open the Serial Monitor at **115200 baud** to view the connected IP address and verify mDNS startup (`http://meet-tally.local`).
 
-### 2. Build & Install the Chrome Extension
+### 2. Install the Chrome Extension
 
-#### Prerequisites
+#### Option A: Quick Install (Pre-built Release – Recommended)
+
+1. Download the latest `crx-meet-tally-x.y.z.zip` from [GitHub Releases](https://github.com/itskdhere/meet-tally/releases/latest).
+2. Extract the downloaded `.zip` file to a permanent folder on your computer (e.g., in `Documents` or a dedicated tools folder).
+3. Open Google Chrome (or any Chromium browser like Brave or Edge) and navigate to `chrome://extensions`.
+4. Enable **Developer mode** using the toggle switch in the top-right corner.
+5. Click **Load unpacked** and select the extracted folder (containing `manifest.json`).
+6. Pin the **Meet Tally** extension to your browser toolbar.
+
+> [!IMPORTANT]
+> **Do not delete, rename, or move the extracted folder** after loading it. Chromium browsers read unpacked extensions directly from that directory on disk; deleting or moving it will cause the extension to fail to load.
+
+_**OR**_,
+
+#### Option B: Build from Source (Developers)
+
+##### Prerequisites
 
 - [Node.js](https://nodejs.org) (≥24)
 - [pnpm](https://pnpm.io) (≥11)
 
-#### Installation & Development
+##### Local Development
 
-1. Clone the repository
+1. Clone the repository:
 
-```bash
-git clone https://github.com/itskdhere/meet-tally.git
-cd meet-tally
-```
+   ```bash
+   git clone https://github.com/itskdhere/meet-tally.git
+   cd meet-tally
+   ```
 
-2. Install dependencies
+2. Install dependencies:
 
-```bash
-pnpm install
-```
+   ```bash
+   pnpm install
+   ```
 
-3. Start development server with hot-reload
+3. Start development server with hot-reload:
 
-```bash
-pnpm dev
-```
+   ```bash
+   pnpm dev
+   ```
 
-#### Loading into Google Chrome
+4. Load into Chrome:
+   - Open `chrome://extensions` and enable **Developer mode**.
+   - Click **Load unpacked** and select the generated [`dist/`](file:///dist/) folder.
 
-1. Open Chrome and navigate to `chrome://extensions/`.
-2. Enable **Developer mode** in the top-right corner.
-3. Click **Load unpacked** and select the [`dist/`](file:///dist/) folder generated by the build process.
-4. Pin the **Meet Tally** extension to your toolbar.
-
-#### Building for Production
+##### Production Build
 
 ```bash
 pnpm build
@@ -165,7 +208,6 @@ The ESP8266 firmware hosts an HTTP REST server with full CORS support:
 **Parameters**:
 
 - `led` / `color`: `green` | `blue` | `yellow` | `red` | `live` | `off`
-- `toggle` (optional): `1` or `true` (toggles state on/off)
 
 **Example Request**:
 
@@ -203,12 +245,6 @@ GET http://meet-tally.local/set?led=live HTTP/1.1
   "uptimeSeconds": 1420
 }
 ```
-
-### 3. Heartbeat / Ping
-
-**Endpoint**: `GET /heartbeat`
-
-**Response**: `200 OK` (`PONG`)
 
 ## 📁 Repository Structure
 
@@ -258,6 +294,10 @@ Meet Tally requests minimal Chrome permissions:
 - **`tabs`**: Monitors active meeting tab lifecycle and closes/reconnects cleanly.
 - **`alarms`**: Periodic background sync heartbeat to prevent state drift.
 - **`host_permissions`**: Allows HTTP fetch communication to your local ESP8266 device and meeting hosts (`meet.google.com`, `teams.microsoft.com`, `teams.live.com`, `teams.cloud.microsoft`).
+
+## 📄 License
+
+This project is licensed under the **GNU General Public License v3.0**. See the [LICENSE](LICENSE) file for details.
 
 <br>
 <p align="center">
